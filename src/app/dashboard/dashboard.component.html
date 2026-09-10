@@ -1,45 +1,8 @@
 <div class="min-h-screen bg-stone-50 text-stone-900 relative">
-  <!-- Navbar -->
-  <header class="bg-white border-b border-stone-200 sticky top-0 z-20">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-stone-900 text-white rounded-lg flex items-center justify-center">
-          <mat-icon class="scale-75">fitness_center</mat-icon>
-        </div>
-        <h1 class="text-lg font-semibold tracking-tight mr-6">Gym Manager</h1>
-
-        <!-- Desktop Tabs in Header -->
-        <div class="hidden md:flex gap-6 h-16 items-center">
-          <button
-            (click)="activeTab.set('schedule')"
-            [class.border-stone-900]="activeTab() === 'schedule'"
-            [class.text-stone-900]="activeTab() === 'schedule'"
-            class="cursor-pointer h-full px-1 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 transition-colors pt-1">
-            Class Schedule
-          </button>
-          <button
-            (click)="activeTab.set('bookings')"
-            [class.border-stone-900]="activeTab() === 'bookings'"
-            [class.text-stone-900]="activeTab() === 'bookings'"
-            class="cursor-pointer h-full px-1 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 transition-colors flex items-center gap-2 pt-1">
-            My Bookings
-            @if (myBookingsDetailed().length > 0) {
-              <span class="bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full text-xs font-semibold">{{ myBookingsDetailed().length }}</span>
-            }
-          </button>
-        </div>
-      </div>
-      <div class="flex items-center gap-4">
-        <span class="text-sm text-stone-500 hidden sm:block">{{ auth.currentUser()?.email }}</span>
-        <button
-          (click)="auth.logout()"
-          class="cursor-pointer text-sm font-medium text-stone-600 hover:text-stone-900 flex items-center gap-1.5 transition-colors">
-          <mat-icon class="text-lg">logout</mat-icon>
-          Sign out
-        </button>
-      </div>
-    </div>
-  </header>
+  <app-dashboard-header
+    [activeTab]="activeTab()"
+    [bookingCount]="bookingCount()"
+    (tabChange)="activeTab.set($event)" />
 
   <main class="max-w-6xl mx-auto px-4 py-8 relative">
     @if (classService.actionError()) {
@@ -49,7 +12,6 @@
       </div>
     }
 
-    <!-- Mobile Tabs (visible only on small screens) -->
     <div class="flex md:hidden gap-6 border-b border-stone-200 mb-8">
       <button
         (click)="activeTab.set('schedule')"
@@ -64,8 +26,8 @@
         [class.text-stone-900]="activeTab() === 'bookings'"
         class="cursor-pointer pb-3 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 transition-colors flex items-center gap-2">
         My Bookings
-        @if (myBookingsDetailed().length > 0) {
-          <span class="bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full text-xs font-semibold">{{ myBookingsDetailed().length }}</span>
+        @if (bookingCount() > 0) {
+          <span class="bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full text-xs font-semibold">{{ bookingCount() }}</span>
         }
       </button>
     </div>
@@ -74,165 +36,13 @@
       <div class="flex items-center justify-center py-24">
         <mat-icon class="animate-spin text-stone-400 h-8 w-8">autorenew</mat-icon>
       </div>
+    } @else if (activeTab() === 'schedule') {
+      <app-classes-view />
     } @else {
-
-      @if (activeTab() === 'schedule') {
-        <!-- Quick Access Bar -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-2 scrollbar-hide sticky top-16 bg-stone-50 z-10 pt-4 -mt-4">
-          @for (day of groupedClasses(); track day.id) {
-            <button
-              (click)="scrollToDay(day.id)"
-              class="cursor-pointer whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-white border border-stone-200 text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-stone-900">
-              {{ day.shortDate }}
-            </button>
-          }
-        </div>
-
-        <!-- Timeline View (Table) -->
-        <div class="space-y-12">
-          @for (day of groupedClasses(); track day.id) {
-            <section [id]="day.id" class="scroll-mt-36">
-              <h3 class="text-lg font-medium text-stone-900 mb-4 sticky top-[120px] bg-stone-50 py-2 z-0">
-                {{ day.date }}
-              </h3>
-
-              <div class="overflow-x-auto rounded-xl border border-stone-200 bg-white shadow-sm">
-                <table class="w-full text-sm text-left">
-                  <thead class="bg-stone-50 border-b border-stone-200 text-stone-600 font-medium">
-                  <tr>
-                    <th class="px-5 py-3.5 w-48">Time</th>
-                    <th class="px-5 py-3.5">Class & Instructor</th>
-                    <th class="px-5 py-3.5 w-32">Capacity</th>
-                    <th class="px-5 py-3.5 w-40 text-right">Action</th>
-                  </tr>
-                  </thead>
-                  <tbody class="divide-y divide-stone-100">
-                    @for (cls of day.classes; track cls.id) {
-                      <tr class="hover:bg-stone-50/50 transition-colors">
-                        <td class="px-5 py-3.5 whitespace-nowrap text-stone-900">
-                          <div class="font-medium">{{ formatTime(cls.start_time) }}</div>
-                          <div class="text-xs text-stone-500 mt-0.5">{{ getDuration(cls.start_time, cls.end_time) }} min</div>
-                        </td>
-                        <td class="px-5 py-3.5">
-                          <div class="font-medium text-stone-900">{{ cls.activity.name }}</div>
-                          <div class="text-stone-500 flex items-center gap-1 mt-0.5">
-                            <mat-icon class="text-[14px] w-[14px] h-[14px]">person</mat-icon>
-                            {{ cls.instructor?.name }}
-                          </div>
-                        </td>
-                        <td class="px-5 py-3.5">
-                          <div class="flex items-center gap-1.5" [ngClass]="{'text-red-700 font-medium': cls.free_slots===0, 'text-stone-600': cls.free_slots > 0}">
-                            <mat-icon class="text-[16px] w-[16px] h-[16px]">group</mat-icon>
-                            {{ cls.total_slots - cls.free_slots }} / {{ cls.total_slots }}
-                          </div>
-                        </td>
-                        <td class="px-5 py-3.5 text-right whitespace-nowrap">
-                          @if (getBookingForClass(cls.id); as booking) {
-                            <button
-                              (click)="cancelBooking(booking)"
-                              class="cursor-pointer text-sm font-medium px-4 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-colors border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-stone-200"
-                              [ngClass]="booking.status === 'CONFIRMED' ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-green-100 text-green-700 hover:bg-green-200'">
-                              <mat-icon class="text-[18px] w-[18px] h-[18px]">
-                                {{ booking.status === 'CONFIRMED' ? 'check_circle' : 'schedule' }}
-                              </mat-icon>
-                              {{ booking.status === 'CONFIRMED' ? 'Booked' : 'Scheduled' }}
-                            </button>
-                          } @else if (cls.free_slots === 0) {
-                            <span class="text-sm text-red-700 bg-red-100 font-medium px-4 py-1.5 rounded-lg inline-block border border-transparent">Full</span>
-                          } @else if (isWithinWindow(cls.start_time)) {
-                            <button
-                              (click)="bookClass(cls.id)"
-                              class="cursor-pointer text-sm font-medium px-4 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-stone-900">
-                              <mat-icon class="text-[18px] w-[18px] h-[18px]">event_available</mat-icon>
-                              Book Now
-                            </button>
-
-                          } @else if (!isWithinWindow(cls.start_time)) {
-                            <button
-                              (click)="scheduleClass(cls)"
-                              class="cursor-pointer text-sm font-medium px-4 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-stone-900">
-                              <mat-icon class="text-[18px] w-[18px] h-[18px]">update</mat-icon>
-                              Schedule
-                            </button>
-                          }
-                        </td>
-                      </tr>
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          }
-        </div>
-      } @else {
-        <!-- My Bookings View -->
-        <div class="overflow-x-auto rounded-xl border border-stone-200 bg-white shadow-sm">
-          <table class="w-full text-sm text-left">
-            <thead class="bg-stone-50 border-b border-stone-200 text-stone-600 font-medium">
-            <tr>
-              <th class="px-5 py-3.5">Date & Time</th>
-              <th class="px-5 py-3.5">Class</th>
-              <th class="px-5 py-3.5">Status</th>
-              <th class="px-5 py-3.5 text-right">Action</th>
-            </tr>
-            </thead>
-            <tbody class="divide-y divide-stone-100">
-              @for (item of myBookingsDetailed(); track item.booking.class_id) {
-                <tr class="hover:bg-stone-50/50 transition-colors">
-                  <td class="px-5 py-3.5 whitespace-nowrap text-stone-900">
-                    <div class="font-medium">{{ formatDate(item.cls.start_time) }}</div>
-                    <div class="text-stone-500 mt-0.5">{{ formatTime(item.cls.start_time) }}</div>
-                  </td>
-                  <td class="px-5 py-3.5">
-                    <div class="font-medium text-stone-900">{{ item.cls.activity.name }}</div>
-                    <div class="text-stone-500 flex items-center gap-1 mt-0.5">
-                      <mat-icon class="text-[14px] w-[14px] h-[14px]">person</mat-icon>
-                      {{ item.cls.instructor }}
-                    </div>
-                  </td>
-                  <td class="px-5 py-3.5">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-transparent"
-                              [ngClass]="item.booking.status === 'CONFIRMED' ? 'bg-green-600 text-white' : 'bg-green-100 text-green-700'">
-                          <mat-icon class="text-[14px] w-[14px] h-[14px]">
-                            {{ item.booking.status === 'CONFIRMED' ? 'check_circle' : 'schedule' }}
-                          </mat-icon>
-                          {{ item.booking.status === 'CONFIRMED' ? 'Confirmed' : 'Scheduled' }}
-                        </span>
-                  </td>
-                  <td class="px-5 py-3.5 text-right whitespace-nowrap">
-                    <button
-                      (click)="cancelBooking(item.booking)"
-                      class="cursor-pointer text-sm font-medium px-3 py-1.5 rounded-lg inline-flex items-center gap-1 text-red-600 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-100 transition-colors">
-                      <mat-icon class="text-[18px] w-[18px] h-[18px]">close</mat-icon>
-                      Cancel
-                    </button>
-                  </td>
-                </tr>
-              }
-              @if (myBookingsDetailed().length === 0) {
-                <tr>
-                  <td colspan="4" class="px-5 py-12 text-center text-stone-500">
-                    <div class="flex flex-col items-center justify-center">
-                      <mat-icon class="text-4xl text-stone-300 mb-3">event_busy</mat-icon>
-                      <p class="text-base font-medium text-stone-900">No bookings yet</p>
-                      <p class="mt-1">Head over to the schedule to book or schedule a class.</p>
-                      <button
-                        (click)="activeTab.set('schedule')"
-                        class="cursor-pointer mt-4 px-4 py-2 text-sm font-medium text-stone-900 bg-stone-100 rounded-lg hover:bg-stone-200 transition-colors">
-                        View Schedule
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
+      <app-bookings-view (viewSchedule)="activeTab.set('schedule')" />
     }
   </main>
 
-  <!-- Scroll to Top Button -->
   @if (showScrollToTop()) {
     <button
       (click)="scrollToTop()"
