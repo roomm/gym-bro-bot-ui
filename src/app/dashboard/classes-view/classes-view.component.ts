@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
-import {format, isAfter, isBefore, subHours} from 'date-fns';
+import {format, isAfter, isBefore, subMinutes} from 'date-fns';
 import {Booking, ClassService, GymClass} from '../../services/class.service';
 
 @Component({
@@ -61,7 +61,7 @@ export class ClassesViewComponent {
 
   isWithinWindow(iso: string) {
     const startTime = new Date(iso);
-    const windowStart = subHours(startTime, 24);
+    const windowStart = subMinutes(startTime, 24 * 60 + 15);
     const now = new Date();
     return isAfter(now, windowStart) && isBefore(now, startTime);
   }
