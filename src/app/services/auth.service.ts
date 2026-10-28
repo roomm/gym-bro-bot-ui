@@ -59,6 +59,7 @@ export class AuthService {
     this.token.set(null);
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem(this.userKey);
     }
     this.router.navigate(['/login']);
   }
