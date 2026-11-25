@@ -4,6 +4,7 @@ import {isPlatformBrowser} from '@angular/common';
 import {Router} from '@angular/router';
 import {catchError, map, tap} from 'rxjs/operators';
 import {of} from 'rxjs';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,6 @@ import {of} from 'rxjs';
 export class AuthService {
   private readonly tokenKey = 'gym_auth_token';
   private readonly userKey = 'gym_auth_user';
-  private readonly baseUrl = 'http://localhost:55555/api';
   // Signals for state
   currentUser = signal<{ id: string, email: string } | null>(null);
   token = signal<string | null>(null);
@@ -40,7 +40,7 @@ export class AuthService {
 
   login(email: string, password: string) {
     this.authError.set(null);
-    return this.http.post<{ access_token: string, token_type: string, user: { id: string, email: string } }>(`${this.baseUrl}/auth/login`, {email, password})
+    return this.http.post<{ access_token: string, token_type: string, user: { id: string, email: string } }>(`${environment.baseUrl}/auth/login`, {email, password})
       .pipe(
         tap(res => {
           this.setSession(res.access_token, res.user);

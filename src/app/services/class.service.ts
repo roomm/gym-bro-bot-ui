@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {AuthService} from './auth.service';
 import {catchError, tap} from 'rxjs/operators';
 import {of} from 'rxjs';
+import {environment} from '../../environments/environment';
 
 
 export interface GymClass {
@@ -48,8 +49,6 @@ export interface Booking {
 })
 export class ClassService {
 
-  private readonly baseUrl = 'http://localhost:55555/api';
-
   classes = signal<GymClass[]>([]);
   myBookings = signal<Booking[]>([]);
 
@@ -69,7 +68,7 @@ export class ClassService {
     if (showLoader) {
       this.loadingClasses.set(true);
     }
-    this.http.get<GymClass[]>(`${this.baseUrl}/class-spot/list-classes`, {headers: this.getHeaders()}).subscribe({
+    this.http.get<GymClass[]>(`${environment.baseUrl}/class-spot/list-classes`, {headers: this.getHeaders()}).subscribe({
       next: (data) => {
         // Sort by start time
         data.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
@@ -88,7 +87,7 @@ export class ClassService {
 
   fetchMyBookings() {
     if (!this.auth.isLoggedIn()) return;
-    this.http.get<Booking[]>(`${this.baseUrl}/scheduler/my-schedule`, {headers: this.getHeaders()}).subscribe({
+    this.http.get<Booking[]>(`${environment.baseUrl}/scheduler/my-schedule`, {headers: this.getHeaders()}).subscribe({
       next: (data) => this.myBookings.set(data),
       error: (err) => console.error('Failed to fetch bookings', err)
     });
@@ -96,7 +95,7 @@ export class ClassService {
 
   bookClass(classId: string) {
     this.actionError.set(null);
-    return this.http.get<Booking>(`${this.baseUrl}/class-spot/book-class-spot/${classId}`, {headers: this.getHeaders()})
+    return this.http.get<Booking>(`${environment.baseUrl}/class-spot/book-class-spot/${classId}`, {headers: this.getHeaders()})
       .pipe(
         tap((booking) => {
           this.fetchMyBookings()
@@ -111,7 +110,7 @@ export class ClassService {
 
   scheduleClass(classActivity: GymClass) {
     this.actionError.set(null);
-    return this.http.post<{ result: string, message: string }>(`${this.baseUrl}/scheduler/schedule-spot/`, classActivity, {headers: this.getHeaders()})
+    return this.http.post<{ result: string, message: string }>(`${environment.baseUrl}/scheduler/schedule-spot/`, classActivity, {headers: this.getHeaders()})
       .pipe(
         tap((booking) => {
           this.fetchMyBookings()
@@ -127,7 +126,7 @@ export class ClassService {
 
   cancelScheduledClass(classActivity: GymClass) {
     this.actionError.set(null);
-    return this.http.post<{ result: string, message: string }>(`${this.baseUrl}/scheduler/cancel-schedule-spot/`, classActivity, {headers: this.getHeaders()})
+    return this.http.post<{ result: string, message: string }>(`${environment.baseUrl}/scheduler/cancel-schedule-spot/`, classActivity, {headers: this.getHeaders()})
       .pipe(
         tap((booking) => {
           this.fetchMyBookings()
@@ -143,7 +142,7 @@ export class ClassService {
 
   cancelBooking(classId: string) {
     this.actionError.set(null);
-    return this.http.get(`${this.baseUrl}/class-spot/cancel-class-spot/${classId}`, {headers: this.getHeaders()})
+    return this.http.get(`${environment.baseUrl}/class-spot/cancel-class-spot/${classId}`, {headers: this.getHeaders()})
       .pipe(
         tap(() => {
           this.fetchMyBookings()
