@@ -20,6 +20,7 @@ pnpm start
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+The development configuration sends API requests to `http://localhost:55555/api`.
 
 ## Code scaffolding
 
@@ -44,6 +45,18 @@ pnpm build
 ```
 
 This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Production builds use `https://gymbro-api.-romanboix.dev/api` for API requests. Use `pnpm exec ng build --configuration development` to build with the development API URL. These URLs are defined in `src/environments/`.
+
+## Docker deployment
+
+From the project root, build and run the production image:
+
+```bash
+docker build -f docker/Dockerfile -t gym-bro-bot-ui .
+docker run --rm -p 8080:80 gym-bro-bot-ui
+```
+
+The app is available at `http://localhost:8080`. The image uses the production API URL, which must be reachable from the user's browser.
 
 ## Running unit tests
 
