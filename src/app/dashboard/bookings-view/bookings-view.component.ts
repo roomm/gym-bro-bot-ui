@@ -32,7 +32,7 @@ export class BookingsViewComponent {
   }
 
   formatTime(iso: string) {
-    return format(new Date(iso), 'h:mm a');
+    return format(new Date(iso), 'HH:mm');
   }
 
   cancelBooking(booking: Booking) {

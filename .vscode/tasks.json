@@ -3,8 +3,10 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "type": "npm",
-      "script": "start",
+      "type": "shell",
+      "label": "pnpm: start",
+      "command": "corepack",
+      "args": ["pnpm", "start"],
       "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
@@ -21,8 +23,10 @@
       }
     },
     {
-      "type": "npm",
-      "script": "test",
+      "type": "shell",
+      "label": "pnpm: test",
+      "command": "corepack",
+      "args": ["pnpm", "test"],
       "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",

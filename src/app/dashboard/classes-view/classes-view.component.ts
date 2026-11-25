@@ -46,7 +46,7 @@ export class ClassesViewComponent {
   }
 
   formatTime(iso: string) {
-    return format(new Date(iso), 'h:mm a');
+    return format(new Date(iso), 'HH:mm');
   }
 
   getDuration(startIso: string, endIso: string) {
