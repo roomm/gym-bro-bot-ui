@@ -110,14 +110,14 @@ export class ClassService {
 
   scheduleClass(classActivity: GymClass) {
     this.actionError.set(null);
-    return this.http.post<{ result: string, message: string }>(`${environment.baseUrl}/scheduler/schedule-spot/`, classActivity, {headers: this.getHeaders()})
+    return this.http.post<{ result: string, message: string }>(`${environment.baseUrl}/scheduler/schedule-spot`, classActivity, {headers: this.getHeaders()})
       .pipe(
         tap((booking) => {
           this.fetchMyBookings()
           this.fetchClasses(false); // Refresh counts quietly
         }),
         catchError(err => {
-          this.actionError.set(err.error?.error || 'Failed to book class');
+          this.actionError.set(err.error?.error || 'Failed to schedule class');
           return of(null);
         })
       );
@@ -126,14 +126,14 @@ export class ClassService {
 
   cancelScheduledClass(classActivity: GymClass) {
     this.actionError.set(null);
-    return this.http.post<{ result: string, message: string }>(`${environment.baseUrl}/scheduler/cancel-schedule-spot/`, classActivity, {headers: this.getHeaders()})
+    return this.http.post<{ result: string, message: string }>(`${environment.baseUrl}/scheduler/cancel-schedule-spot`, classActivity, {headers: this.getHeaders()})
       .pipe(
         tap((booking) => {
           this.fetchMyBookings()
           this.fetchClasses(false); // Refresh counts quietly
         }),
         catchError(err => {
-          this.actionError.set(err.error?.error || 'Failed to book class');
+          this.actionError.set(err.error?.error || 'Failed to cancel scheduled class');
           return of(null);
         })
       );
