@@ -27,7 +27,11 @@ export class BookingsViewComponent {
   });
 
   formatDate(iso: string) {
-    return format(new Date(iso), this.i18n.language() === 'es' ? "d 'de' MMM 'de' yyyy" : 'MMM do, yyyy', {locale: this.i18n.dateLocale()});
+    const date = new Date(iso);
+    if (this.i18n.language() === 'ca') {
+      return new Intl.DateTimeFormat('ca-ES', {day: 'numeric', month: 'short', year: 'numeric'}).format(date);
+    }
+    return format(date, this.i18n.language() === 'es' ? "d 'de' MMM 'de' yyyy" : 'MMM do, yyyy', {locale: this.i18n.dateLocale()});
   }
 
   formatTime(iso: string) {

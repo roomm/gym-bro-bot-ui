@@ -10,10 +10,11 @@
     <div class="site-account">
       <div class="language-switch" role="group" [attr.aria-label]="i18n.t('language')">
         <button type="button" lang="es" [attr.aria-pressed]="i18n.language() === 'es'" (click)="i18n.setLanguage('es')">ES</button>
+        <button type="button" lang="ca" [attr.aria-pressed]="i18n.language() === 'ca'" (click)="i18n.setLanguage('ca')">CA</button>
         <button type="button" lang="en" [attr.aria-pressed]="i18n.language() === 'en'" (click)="i18n.setLanguage('en')">EN</button>
       </div>
       <span class="site-account__email">{{ auth.currentUser()?.email }}</span>
-      <button type="button" class="sign-out" (click)="auth.logout()">{{ i18n.t('signOut') }} <span aria-hidden="true">↗</span></button>
+      <button type="button" class="sign-out" [attr.aria-label]="i18n.t('signOut')" [attr.title]="i18n.t('signOut')" (click)="auth.logout()"><span class="sign-out__label">{{ i18n.t('signOut') }}</span><span class="sign-out__arrow" aria-hidden="true">↗</span><mat-icon class="sign-out__icon" aria-hidden="true">logout</mat-icon></button>
     </div>
   </div>
 </header>

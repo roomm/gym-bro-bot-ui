@@ -36,4 +36,27 @@ describe('LanguageService', () => {
     expect(language.spots(1)).toBe('1 SPOT LEFT');
     expect(document.documentElement.lang).toBe('en');
   });
+
+  it('restores Catalan, translates UI and uses Catalan dates', () => {
+    localStorage.setItem('gym_bro_language', 'ca');
+    const language = TestBed.inject(LanguageService);
+
+    expect(language.language()).toBe('ca');
+    expect(document.documentElement.lang).toBe('ca');
+    expect(language.t('bookingsTab')).toBe('Les meves reserves');
+    expect(language.sessionCount(1)).toBe('1 SESSIÓ');
+    expect(language.spots(1)).toBe('1 PLAÇA LLIURE');
+    expect(language.error('Invalid credentials')).toBe('Credencials incorrectes');
+    expect(format(new Date(2026, 10, 27), 'EEEE', {locale: language.dateLocale()})).toBe('divendres');
+  });
+
+  it('defaults to Catalan when the browser language is Catalan', () => {
+    localStorage.removeItem('gym_bro_language');
+    const browserLanguage = vi.spyOn(navigator, 'language', 'get').mockReturnValue('ca-ES');
+    try {
+      expect(TestBed.inject(LanguageService).language()).toBe('ca');
+    } finally {
+      browserLanguage.mockRestore();
+    }
+  });
 });

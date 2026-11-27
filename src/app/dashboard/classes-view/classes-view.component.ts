@@ -32,7 +32,9 @@ export class ClassesViewComponent {
     return Array.from(grouped.entries()).map(([id, items]) => {
       const parsedDate = new Date(items[0].start_time);
       return {
-        date: format(parsedDate, language === 'es' ? "EEEE, d 'de' MMMM" : 'EEEE, MMM do', {locale}),
+        date: language === 'ca'
+          ? new Intl.DateTimeFormat('ca-ES', {weekday: 'long', day: 'numeric', month: 'long'}).format(parsedDate)
+          : format(parsedDate, language === 'es' ? "EEEE, d 'de' MMMM" : 'EEEE, MMM do', {locale}),
         weekday: format(parsedDate, 'EEE', {locale}).toUpperCase(),
         dayNumber: format(parsedDate, 'd'),
         id: `day-${id}`,

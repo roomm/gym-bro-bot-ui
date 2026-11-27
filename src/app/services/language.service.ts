@@ -1,8 +1,8 @@
 import {Injectable, PLATFORM_ID, inject, signal} from '@angular/core';
 import {isPlatformBrowser} from '@angular/common';
-import {enUS, es} from 'date-fns/locale';
+import {ca, enUS, es} from 'date-fns/locale';
 
-export type Language = 'en' | 'es';
+export type Language = 'en' | 'es' | 'ca';
 
 const messages = {
   en: {
@@ -117,6 +117,62 @@ const messages = {
     cancelScheduleFailed: 'No se pudo cancelar la clase programada',
     cancelFailed: 'No se pudo cancelar la reserva',
   },
+  ca: {
+    language: 'Idioma',
+    mainNavigation: 'Navegació principal',
+    scheduleTab: 'Horari de classes',
+    bookingsTab: 'Les meves reserves',
+    signOut: 'Tanca la sessió',
+    loadingClasses: 'S’estan carregant les classes…',
+    scrollToTop: 'Torna a dalt',
+    noClassesEyebrow: 'No hi ha res al calendari',
+    noClassesTitle: 'No hi ha classes pròximes',
+    noClassesDescription: 'Torna més tard per veure noves sessions.',
+    jumpToDay: 'Ves a',
+    pickDay: 'Tria un dia',
+    session: 'SESSIÓ',
+    sessions: 'SESSIONS',
+    with: 'AMB',
+    minutes: 'MIN',
+    noSpots: 'SENSE PLACES',
+    oneSpotLeft: 'PLAÇA LLIURE',
+    spotsLeft: 'PLACES LLIURES',
+    booked: '✓ RESERVADA',
+    scheduled: '◷ PROGRAMADA',
+    confirmed: '✓ CONFIRMADA',
+    bookingFailed: 'RESERVA FALLIDA',
+    manageBooking: 'Gestiona la reserva',
+    full: 'COMPLETA',
+    bookNow: 'RESERVA',
+    schedule: 'PROGRAMA',
+    noBookingsEyebrow: 'Tens el calendari lliure',
+    noBookingsTitle: 'Encara no tens reserves',
+    noBookingsDescription: 'Troba una sessió que t’agradi i reserva-hi una plaça.',
+    viewSchedule: 'VEURE L’HORARI',
+    comingUp: 'Properes classes',
+    cancelBooking: 'Cancel·la la reserva',
+    footer: 'BONES SESSIONS. BONA GENT. ENS VEIEM A CLASSE. ↗',
+    loginEyebrow: 'Entrena al teu ritme',
+    loginHeadline: 'Fes el',
+    loginHeadlineAccent: 'pas.',
+    loginDescription: 'Troba la teva propera sessió. Entrena amb ganes.',
+    loginFooter: 'BONES SESSIONS. BONA GENT. ↗',
+    welcomeBack: 'Et donem la benvinguda',
+    getInTheGame: 'Posa’t en marxa.',
+    loginInstructions: 'Inicia sessió per explorar les classes i gestionar les teves reserves.',
+    email: 'CORREU ELECTRÒNIC',
+    emailPlaceholder: 'tu@exemple.cat',
+    password: 'CONTRASENYA',
+    passwordPlaceholder: 'Introdueix la contrasenya',
+    signingIn: 'S’ESTÀ INICIANT LA SESSIÓ…',
+    signIn: 'INICIA LA SESSIÓ',
+    loginFailed: 'No s’ha pogut iniciar la sessió',
+    invalidCredentials: 'Credencials incorrectes',
+    bookFailed: 'No s’ha pogut reservar la classe',
+    scheduleFailed: 'No s’ha pogut programar la classe',
+    cancelScheduleFailed: 'No s’ha pogut cancel·lar la classe programada',
+    cancelFailed: 'No s’ha pogut cancel·lar la reserva',
+  },
 } as const;
 
 type MessageKey = keyof typeof messages.en;
@@ -145,7 +201,11 @@ export class LanguageService {
   }
 
   dateLocale() {
-    return this.language() === 'es' ? es : enUS;
+    switch (this.language()) {
+      case 'ca': return ca;
+      case 'es': return es;
+      default: return enUS;
+    }
   }
 
   error(message: string | null): string {
@@ -176,10 +236,11 @@ export class LanguageService {
     if (!isPlatformBrowser(this.platformId)) return 'en';
     try {
       const saved = localStorage.getItem('gym_bro_language');
-      if (saved === 'en' || saved === 'es') return saved;
+      if (saved === 'en' || saved === 'es' || saved === 'ca') return saved;
     } catch {
       // Fall back to the browser language when storage is unavailable.
     }
-    return navigator.language.toLowerCase().startsWith('es') ? 'es' : 'en';
+    const browserLanguage = navigator.language.toLowerCase().split('-')[0];
+    return browserLanguage === 'es' || browserLanguage === 'ca' ? browserLanguage : 'en';
   }
 }

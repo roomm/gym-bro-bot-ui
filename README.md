@@ -24,7 +24,7 @@ The development configuration sends API requests to `http://localhost:55555/api`
 
 ## Languages
 
-The sign-in screen and dashboard offer an **ES / EN** switcher. The app initially uses the browser language (Spanish for `es` locales, English otherwise), remembers your selection in local storage, and updates dates and page language immediately. UI text lives in `src/app/services/language.service.ts`. Class names, instructor names, room names, and unrecognized messages returned by the API are displayed as supplied by the server.
+The sign-in screen and dashboard offer an **ES / CA / EN** switcher. The app initially uses the browser language (Spanish for `es`, Catalan for `ca`, English otherwise), remembers your selection in local storage, and updates dates and page language immediately. UI text lives in `src/app/services/language.service.ts`. Class names, instructor names, room names, and unrecognized messages returned by the API are displayed as supplied by the server.
 
 ## Code scaffolding
 
