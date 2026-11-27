@@ -1,13 +1,10 @@
 import {ChangeDetectionStrategy, Component, computed, inject, output} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {MatIconModule} from '@angular/material/icon';
 import {format, isBefore} from 'date-fns';
 import {Booking, ClassService, GymClass} from '../../services/class.service';
 
 @Component({
   selector: 'app-bookings-view',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './bookings-view.component.html',
 })
@@ -33,6 +30,10 @@ export class BookingsViewComponent {
 
   formatTime(iso: string) {
     return format(new Date(iso), 'HH:mm');
+  }
+
+  getDuration(startIso: string, endIso: string) {
+    return Math.round((new Date(endIso).getTime() - new Date(startIso).getTime()) / 60000);
   }
 
   cancelBooking(booking: Booking) {

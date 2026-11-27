@@ -1,5 +1,4 @@
 import {ChangeDetectionStrategy, Component, inject, input, output} from '@angular/core';
-import {MatIconModule} from '@angular/material/icon';
 import {AuthService} from '../../services/auth.service';
 
 export type DashboardTab = 'schedule' | 'bookings';
@@ -7,7 +6,6 @@ export type DashboardTab = 'schedule' | 'bookings';
 @Component({
   selector: 'app-dashboard-header',
   standalone: true,
-  imports: [MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './header.component.html',
 })

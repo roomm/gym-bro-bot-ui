@@ -1,53 +1,29 @@
-<div class="min-h-screen bg-stone-50 text-stone-900 relative">
+<div class="app-shell">
   <app-dashboard-header
     [activeTab]="activeTab()"
     [bookingCount]="bookingCount()"
     (tabChange)="activeTab.set($event)" />
 
-  <main class="max-w-6xl mx-auto px-4 py-8 relative">
+  <main class="dashboard">
     @if (classService.actionError()) {
-      <div class="mb-6 p-4 bg-red-50 text-red-700 rounded-xl text-sm flex items-start gap-3 border border-red-100">
-        <mat-icon class="text-red-500 shrink-0">error_outline</mat-icon>
-        <p>{{ classService.actionError() }}</p>
+      <div class="action-error" role="alert">
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <span>{{ classService.actionError() }}</span>
       </div>
     }
 
-    <div class="flex md:hidden gap-6 border-b border-stone-200 mb-8">
-      <button
-        (click)="activeTab.set('schedule')"
-        [class.border-stone-900]="activeTab() === 'schedule'"
-        [class.text-stone-900]="activeTab() === 'schedule'"
-        class="cursor-pointer pb-3 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 transition-colors">
-        Class Schedule
-      </button>
-      <button
-        (click)="activeTab.set('bookings')"
-        [class.border-stone-900]="activeTab() === 'bookings'"
-        [class.text-stone-900]="activeTab() === 'bookings'"
-        class="cursor-pointer pb-3 text-sm font-medium border-b-2 border-transparent text-stone-500 hover:text-stone-700 transition-colors flex items-center gap-2">
-        My Bookings
-        @if (bookingCount() > 0) {
-          <span class="bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full text-xs font-semibold">{{ bookingCount() }}</span>
-        }
-      </button>
-    </div>
-
     @if (classService.loadingClasses()) {
-      <div class="flex items-center justify-center py-24">
-        <mat-icon class="animate-spin text-stone-400 h-8 w-8">autorenew</mat-icon>
-      </div>
+      <div class="loading-state" role="status"><mat-icon class="animate-spin" aria-hidden="true">autorenew</mat-icon> Loading classes…</div>
     } @else if (activeTab() === 'schedule') {
-      <app-classes-view />
+      <app-classes-view (viewBookings)="activeTab.set('bookings')" />
     } @else {
       <app-bookings-view (viewSchedule)="activeTab.set('schedule')" />
     }
   </main>
 
   @if (showScrollToTop()) {
-    <button
-      (click)="scrollToTop()"
-      class="cursor-pointer fixed bottom-6 right-6 p-3 bg-stone-900 text-white rounded-full shadow-lg hover:bg-stone-800 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-stone-900 flex items-center justify-center z-50 animate-in fade-in zoom-in duration-200">
-      <mat-icon>arrow_upward</mat-icon>
+    <button type="button" class="back-to-top" (click)="scrollToTop()" aria-label="Scroll to top">
+      <mat-icon aria-hidden="true">arrow_upward</mat-icon>
     </button>
   }
 </div>

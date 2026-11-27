@@ -1,86 +1,56 @@
-<div class="flex items-center gap-2 overflow-x-auto pb-4 mb-2 scrollbar-hide sticky top-16 bg-stone-50 z-10 pt-4 -mt-4">
-  @for (day of groupedClasses(); track day.id) {
-    <button
-      (click)="scrollToDay(day.id)"
-      class="cursor-pointer whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium bg-white border border-stone-200 text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-stone-900">
-      {{ day.shortDate }}
-    </button>
-  }
-</div>
+@if (groupedClasses().length === 0) {
+  <div class="empty-state">
+    <div class="eyebrow">Nothing on the calendar</div>
+    <h2>No upcoming classes</h2>
+    <p>Check back later for new sessions.</p>
+  </div>
+} @else {
+  <div class="schedule-layout">
+    <nav class="day-nav" aria-label="Jump to a day">
+      <div class="day-nav__title eyebrow">Pick a day</div>
+      @for (day of groupedClasses(); track day.id) {
+        <button type="button" class="day-nav__day" [class.is-selected]="(activeDay() ?? groupedClasses()[0].id) === day.id" (click)="scrollToDay(day.id)" [attr.aria-label]="'Jump to ' + day.date">
+          <span>{{ day.weekday }}</span><strong>{{ day.dayNumber }}</strong>
+        </button>
+      }
+    </nav>
 
-<div class="space-y-12">
-  @for (day of groupedClasses(); track day.id) {
-    <section [id]="day.id" class="scroll-mt-36">
-      <h3 class="text-lg font-medium text-stone-900 mb-4 sticky top-[120px] bg-stone-50 py-2 z-0">
-        {{ day.date }}
-      </h3>
-
-      <div class="overflow-x-auto rounded-xl border border-stone-200 bg-white shadow-sm">
-        <table class="w-full text-sm text-left">
-          <thead class="bg-stone-50 border-b border-stone-200 text-stone-600 font-medium">
-          <tr>
-            <th class="px-5 py-3.5 w-48">Time</th>
-            <th class="px-5 py-3.5">Class & Instructor</th>
-            <th class="px-5 py-3.5 w-32">Capacity</th>
-            <th class="px-5 py-3.5 w-40 text-right">Action</th>
-          </tr>
-          </thead>
-          <tbody class="divide-y divide-stone-100">
+    <div class="schedule-days">
+      @for (day of groupedClasses(); track day.id) {
+        <section class="schedule-day" [id]="day.id" [attr.aria-label]="day.date">
+          <div class="section-heading"><h2>{{ day.date }}</h2><span>{{ day.classes.length }} {{ day.classes.length === 1 ? 'SESSION' : 'SESSIONS' }}</span></div>
+          <div class="session-list">
             @for (cls of day.classes; track cls.id) {
-              <tr class="hover:bg-stone-50/50 transition-colors">
-                <td class="px-5 py-3.5 whitespace-nowrap text-stone-900">
-                  <div class="font-medium">{{ formatTime(cls.start_time) }}</div>
-                  <div class="text-xs text-stone-500 mt-0.5">{{ getDuration(cls.start_time, cls.end_time) }} min</div>
-                </td>
-                <td class="px-5 py-3.5">
-                  <div class="font-medium text-stone-900">{{ cls.activity.name }}</div>
-                  <div class="text-stone-500 flex items-center gap-1 mt-0.5">
-                    @if (cls.instructor) {
-                      <mat-icon class="text-[14px] w-[14px] h-[14px]">person</mat-icon>
-                      {{ cls.instructor.name }}
-                    }
-                  </div>
-                </td>
-                <td class="px-5 py-3.5">
-                  <div class="flex items-center gap-1.5" [ngClass]="{'text-red-700 font-medium': cls.free_slots === 0, 'text-stone-600': cls.free_slots > 0}">
-                    <mat-icon class="text-[16px] w-[16px] h-[16px]">group</mat-icon>
-                    {{ cls.total_slots - cls.free_slots }} / {{ cls.total_slots }}
-                  </div>
-                </td>
-                <td class="px-5 py-3.5 text-right whitespace-nowrap">
+              <article class="session-card">
+                <div class="session-card__time">{{ formatTime(cls.start_time) }}</div>
+                <div class="session-card__details">
+                  <h3>{{ cls.activity.name }}</h3>
+                  <p>
+                    @if (cls.instructor?.name) { WITH {{ cls.instructor?.name }} · }
+                    {{ getDuration(cls.start_time, cls.end_time) }} MIN
+                    @if (cls.room.name) { · {{ cls.room.name }} }
+                  </p>
+                  <span class="spots-tag" [class.spots-tag--full]="cls.free_slots === 0">
+                    {{ cls.free_slots === 0 ? 'NO SPOTS LEFT' : cls.free_slots + ' SPOTS LEFT' }}
+                  </span>
+                </div>
+                <div class="session-card__action">
                   @if (getBookingForClass(cls.id); as booking) {
-                    <button
-                      (click)="cancelBooking(booking)"
-                      class="cursor-pointer text-sm font-medium px-4 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-colors border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-stone-200"
-                      [ngClass]="booking.status === 'CONFIRMED' ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-green-100 text-green-700 hover:bg-green-200'">
-                      <mat-icon class="text-[18px] w-[18px] h-[18px]">
-                        {{ booking.status === 'CONFIRMED' ? 'check_circle' : 'schedule' }}
-                      </mat-icon>
-                      {{ booking.status === 'CONFIRMED' ? 'Booked' : 'Scheduled' }}
-                    </button>
+                    <span class="booking-state">{{ booking.status === 'CONFIRMED' ? '✓ BOOKED' : '◷ SCHEDULED' }}</span>
+                    <button type="button" class="manage-link" (click)="viewBookings.emit()">Manage booking</button>
                   } @else if (cls.free_slots === 0) {
-                    <span class="text-sm text-red-700 bg-red-100 font-medium px-4 py-1.5 rounded-lg inline-block border border-transparent">Full</span>
+                    <span class="unavailable-state">FULL</span>
                   } @else if (isWithinWindow(cls.start_time)) {
-                    <button
-                      (click)="bookClass(cls.id)"
-                      class="cursor-pointer text-sm font-medium px-4 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-stone-900">
-                      <mat-icon class="text-[18px] w-[18px] h-[18px]">event_available</mat-icon>
-                      Book Now
-                    </button>
-                  } @else if (!isWithinWindow(cls.start_time)) {
-                    <button
-                      (click)="scheduleClass(cls)"
-                      class="cursor-pointer text-sm font-medium px-4 py-1.5 rounded-lg inline-flex items-center gap-1.5 transition-all bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-stone-900">
-                      <mat-icon class="text-[18px] w-[18px] h-[18px]">update</mat-icon>
-                      Schedule
-                    </button>
+                    <button type="button" class="primary-action" (click)="bookClass(cls.id)">BOOK NOW <span aria-hidden="true">↗</span></button>
+                  } @else {
+                    <button type="button" class="primary-action" (click)="scheduleClass(cls)">SCHEDULE <span aria-hidden="true">↗</span></button>
                   }
-                </td>
-              </tr>
+                </div>
+              </article>
             }
-          </tbody>
-        </table>
-      </div>
-    </section>
-  }
-</div>
+          </div>
+        </section>
+      }
+    </div>
+  </div>
+}

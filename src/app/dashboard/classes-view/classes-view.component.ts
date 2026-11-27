@@ -1,18 +1,17 @@
-import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {MatIconModule} from '@angular/material/icon';
+import {ChangeDetectionStrategy, Component, computed, inject, output, signal} from '@angular/core';
 import {format, isAfter, isBefore, subMinutes} from 'date-fns';
 import {Booking, ClassService, GymClass} from '../../services/class.service';
 
 @Component({
   selector: 'app-classes-view',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './classes-view.component.html',
 })
 export class ClassesViewComponent {
   readonly classService = inject(ClassService);
+  readonly viewBookings = output<void>();
+  readonly activeDay = signal<string | null>(null);
 
   readonly groupedClasses = computed(() => {
     const classes = this.classService.classes().filter(cls => !this.isPast(cls.start_time));
@@ -30,7 +29,8 @@ export class ClassesViewComponent {
       const parsedDate = new Date(items[0].start_time);
       return {
         date,
-        shortDate: format(parsedDate, 'EEE, MMM d'),
+        weekday: format(parsedDate, 'EEE').toUpperCase(),
+        dayNumber: format(parsedDate, 'd'),
         id: date.toLowerCase().replace(/[^a-z0-9]/g, '-'),
         classes: items,
       };
@@ -38,10 +38,10 @@ export class ClassesViewComponent {
   });
 
   scrollToDay(dayId: string) {
+    this.activeDay.set(dayId);
     const element = document.getElementById(dayId);
     if (element) {
-      const y = element.getBoundingClientRect().top + window.scrollY - 130;
-      window.scrollTo({top: y, behavior: 'smooth'});
+      element.scrollIntoView({behavior: 'smooth', block: 'start'});
     }
   }
 
