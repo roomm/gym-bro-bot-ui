@@ -8,12 +8,12 @@
     @if (classService.actionError()) {
       <div class="action-error" role="alert">
         <mat-icon aria-hidden="true">error_outline</mat-icon>
-        <span>{{ classService.actionError() }}</span>
+        <span>{{ i18n.error(classService.actionError()) }}</span>
       </div>
     }
 
     @if (classService.loadingClasses()) {
-      <div class="loading-state" role="status"><mat-icon class="animate-spin" aria-hidden="true">autorenew</mat-icon> Loading classes…</div>
+      <div class="loading-state" role="status"><mat-icon class="animate-spin" aria-hidden="true">autorenew</mat-icon> {{ i18n.t('loadingClasses') }}</div>
     } @else if (activeTab() === 'schedule') {
       <app-classes-view (viewBookings)="activeTab.set('bookings')" />
     } @else {
@@ -22,7 +22,7 @@
   </main>
 
   @if (showScrollToTop()) {
-    <button type="button" class="back-to-top" (click)="scrollToTop()" aria-label="Scroll to top">
+    <button type="button" class="back-to-top" (click)="scrollToTop()" [attr.aria-label]="i18n.t('scrollToTop')">
       <mat-icon aria-hidden="true">arrow_upward</mat-icon>
     </button>
   }

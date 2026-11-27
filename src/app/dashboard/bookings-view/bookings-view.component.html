@@ -1,13 +1,13 @@
 <div class="bookings-layout">
   @if (bookings().length === 0) {
     <div class="empty-state">
-      <div class="eyebrow">Your calendar is clear</div>
-      <h2>No bookings yet</h2>
-      <p>Find a session you like and make it yours.</p>
-      <button type="button" class="primary-action" (click)="viewSchedule.emit()">VIEW SCHEDULE <span aria-hidden="true">↗</span></button>
+      <div class="eyebrow">{{ i18n.t('noBookingsEyebrow') }}</div>
+      <h2>{{ i18n.t('noBookingsTitle') }}</h2>
+      <p>{{ i18n.t('noBookingsDescription') }}</p>
+      <button type="button" class="primary-action" (click)="viewSchedule.emit()">{{ i18n.t('viewSchedule') }} <span aria-hidden="true">↗</span></button>
     </div>
   } @else {
-    <div class="section-heading"><h2>Coming up</h2><span>{{ bookings().length }} {{ bookings().length === 1 ? 'SESSION' : 'SESSIONS' }}</span></div>
+    <div class="section-heading"><h2>{{ i18n.t('comingUp') }}</h2><span>{{ i18n.sessionCount(bookings().length) }}</span></div>
     <div class="session-list">
       @for (item of bookings(); track item.booking.class_id) {
         <article class="session-card booking-card">
@@ -15,16 +15,16 @@
           <div class="session-card__details">
             <h3>{{ item.cls.activity.name }}</h3>
             <p>
-              @if (item.cls.instructor?.name) { WITH {{ item.cls.instructor?.name }} · }
-              {{ getDuration(item.cls.start_time, item.cls.end_time) }} MIN
+              @if (item.cls.instructor?.name) { {{ i18n.t('with') }} {{ item.cls.instructor?.name }} · }
+              {{ getDuration(item.cls.start_time, item.cls.end_time) }} {{ i18n.t('minutes') }}
               @if (item.cls.room.name) { · {{ item.cls.room.name }} }
             </p>
-            <span class="spots-tag">{{ item.booking.status === 'CONFIRMED' ? '✓ CONFIRMED' : '◷ SCHEDULED' }}</span>
+            <span class="spots-tag">{{ item.booking.status === 'CONFIRMED' ? i18n.t('confirmed') : item.booking.status === 'SCHEDULED' ? i18n.t('scheduled') : i18n.t('bookingFailed') }}</span>
           </div>
-          <div class="session-card__action"><button type="button" class="cancel-action" (click)="cancelBooking(item.booking)">Cancel booking</button></div>
+          <div class="session-card__action"><button type="button" class="cancel-action" (click)="cancelBooking(item.booking)">{{ i18n.t('cancelBooking') }}</button></div>
         </article>
       }
     </div>
-    <div class="schedule-footnote">GOOD SESSIONS. GOOD PEOPLE. SEE YOU IN CLASS. ↗</div>
+    <div class="schedule-footnote">{{ i18n.t('footer') }}</div>
   }
 </div>

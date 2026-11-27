@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, computed, inject, output} from '@angular/core';
 import {format, isBefore} from 'date-fns';
 import {Booking, ClassService, GymClass} from '../../services/class.service';
+import {LanguageService} from '../../services/language.service';
 
 @Component({
   selector: 'app-bookings-view',
@@ -10,6 +11,7 @@ import {Booking, ClassService, GymClass} from '../../services/class.service';
 })
 export class BookingsViewComponent {
   readonly classService = inject(ClassService);
+  readonly i18n = inject(LanguageService);
   readonly viewSchedule = output<void>();
 
   readonly bookings = computed(() => {
@@ -25,7 +27,7 @@ export class BookingsViewComponent {
   });
 
   formatDate(iso: string) {
-    return format(new Date(iso), 'MMM do, yyyy');
+    return format(new Date(iso), this.i18n.language() === 'es' ? "d 'de' MMM 'de' yyyy" : 'MMM do, yyyy', {locale: this.i18n.dateLocale()});
   }
 
   formatTime(iso: string) {

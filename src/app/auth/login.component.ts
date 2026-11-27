@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
+import {LanguageService} from '../services/language.service';
 
 @Component({
   selector: 'app-login',
@@ -13,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class LoginComponent implements OnInit {
   auth = inject(AuthService);
+  i18n = inject(LanguageService);
   fb = inject(FormBuilder);
   router = inject(Router);
 

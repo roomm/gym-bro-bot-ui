@@ -1,31 +1,37 @@
 <main class="login-page">
   <div class="login-layout">
     <div class="login-story">
-      <div class="site-brand"><span class="site-brand__mark">G</span><span>GYM BRO</span></div>
-      <div class="login-story__message">
-        <div class="eyebrow">Your training, on your time</div>
-        <h1>Make your<br><span>move.</span></h1>
-        <p>Find your next session. Show up strong.</p>
+      <div class="login-story__top">
+        <div class="site-brand"><span class="site-brand__mark">G</span><span>GYM BRO</span></div>
+        <div class="language-switch" role="group" [attr.aria-label]="i18n.t('language')">
+          <button type="button" lang="es" [attr.aria-pressed]="i18n.language() === 'es'" (click)="i18n.setLanguage('es')">ES</button>
+          <button type="button" lang="en" [attr.aria-pressed]="i18n.language() === 'en'" (click)="i18n.setLanguage('en')">EN</button>
+        </div>
       </div>
-      <div class="login-story__footer">GOOD SESSIONS. GOOD PEOPLE. ↗</div>
+      <div class="login-story__message">
+        <div class="eyebrow">{{ i18n.t('loginEyebrow') }}</div>
+        <h1>{{ i18n.t('loginHeadline') }}<br><span>{{ i18n.t('loginHeadlineAccent') }}</span></h1>
+        <p>{{ i18n.t('loginDescription') }}</p>
+      </div>
+      <div class="login-story__footer">{{ i18n.t('loginFooter') }}</div>
     </div>
     <div class="login-panel">
       <div class="login-panel__inner">
-        <div class="eyebrow">Welcome back</div>
-        <h2>Get in the game.</h2>
-        <p>Sign in to explore classes and manage your bookings.</p>
+        <div class="eyebrow">{{ i18n.t('welcomeBack') }}</div>
+        <h2>{{ i18n.t('getInTheGame') }}</h2>
+        <p>{{ i18n.t('loginInstructions') }}</p>
 
         @if (auth.authError()) {
-          <div class="action-error" role="alert"><mat-icon aria-hidden="true">error_outline</mat-icon><span>{{ auth.authError() }}</span></div>
+          <div class="action-error" role="alert"><mat-icon aria-hidden="true">error_outline</mat-icon><span>{{ i18n.error(auth.authError()) }}</span></div>
         }
 
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-          <label for="email">EMAIL ADDRESS</label>
-          <input id="email" type="email" formControlName="email" autocomplete="email" placeholder="you@example.com">
-          <label for="password">PASSWORD</label>
-          <input id="password" type="password" formControlName="password" autocomplete="current-password" placeholder="Enter your password">
+          <label for="email">{{ i18n.t('email') }}</label>
+          <input id="email" type="email" formControlName="email" autocomplete="email" [placeholder]="i18n.t('emailPlaceholder')">
+          <label for="password">{{ i18n.t('password') }}</label>
+          <input id="password" type="password" formControlName="password" autocomplete="current-password" [placeholder]="i18n.t('passwordPlaceholder')">
           <button type="submit" class="primary-action login-submit" [disabled]="loading() || loginForm.invalid">
-            @if (loading()) { SIGNING IN… } @else { SIGN IN <span aria-hidden="true">↗</span> }
+            @if (loading()) { {{ i18n.t('signingIn') }} } @else { {{ i18n.t('signIn') }} <span aria-hidden="true">↗</span> }
           </button>
         </form>
       </div>

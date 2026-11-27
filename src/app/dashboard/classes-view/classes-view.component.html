@@ -1,15 +1,15 @@
 @if (groupedClasses().length === 0) {
   <div class="empty-state">
-    <div class="eyebrow">Nothing on the calendar</div>
-    <h2>No upcoming classes</h2>
-    <p>Check back later for new sessions.</p>
+    <div class="eyebrow">{{ i18n.t('noClassesEyebrow') }}</div>
+    <h2>{{ i18n.t('noClassesTitle') }}</h2>
+    <p>{{ i18n.t('noClassesDescription') }}</p>
   </div>
 } @else {
   <div class="schedule-layout">
-    <nav class="day-nav" aria-label="Jump to a day">
-      <div class="day-nav__title eyebrow">Pick a day</div>
+    <nav class="day-nav" [attr.aria-label]="i18n.t('pickDay')">
+      <div class="day-nav__title eyebrow">{{ i18n.t('pickDay') }}</div>
       @for (day of groupedClasses(); track day.id) {
-        <button type="button" class="day-nav__day" [class.is-selected]="(activeDay() ?? groupedClasses()[0].id) === day.id" (click)="scrollToDay(day.id)" [attr.aria-label]="'Jump to ' + day.date">
+        <button type="button" class="day-nav__day" [class.is-selected]="(activeDay() ?? groupedClasses()[0].id) === day.id" (click)="scrollToDay(day.id)" [attr.aria-label]="i18n.t('jumpToDay') + ' ' + day.date">
           <span>{{ day.weekday }}</span><strong>{{ day.dayNumber }}</strong>
         </button>
       }
@@ -18,7 +18,7 @@
     <div class="schedule-days">
       @for (day of groupedClasses(); track day.id) {
         <section class="schedule-day" [id]="day.id" [attr.aria-label]="day.date">
-          <div class="section-heading"><h2>{{ day.date }}</h2><span>{{ day.classes.length }} {{ day.classes.length === 1 ? 'SESSION' : 'SESSIONS' }}</span></div>
+          <div class="section-heading"><h2>{{ day.date }}</h2><span>{{ i18n.sessionCount(day.classes.length) }}</span></div>
           <div class="session-list">
             @for (cls of day.classes; track cls.id) {
               <article class="session-card">
@@ -26,24 +26,24 @@
                 <div class="session-card__details">
                   <h3>{{ cls.activity.name }}</h3>
                   <p>
-                    @if (cls.instructor?.name) { WITH {{ cls.instructor?.name }} · }
-                    {{ getDuration(cls.start_time, cls.end_time) }} MIN
+                    @if (cls.instructor?.name) { {{ i18n.t('with') }} {{ cls.instructor?.name }} · }
+                    {{ getDuration(cls.start_time, cls.end_time) }} {{ i18n.t('minutes') }}
                     @if (cls.room.name) { · {{ cls.room.name }} }
                   </p>
                   <span class="spots-tag" [class.spots-tag--full]="cls.free_slots === 0">
-                    {{ cls.free_slots === 0 ? 'NO SPOTS LEFT' : cls.free_slots + ' SPOTS LEFT' }}
+                    {{ i18n.spots(cls.free_slots) }}
                   </span>
                 </div>
                 <div class="session-card__action">
                   @if (getBookingForClass(cls.id); as booking) {
-                    <span class="booking-state">{{ booking.status === 'CONFIRMED' ? '✓ BOOKED' : '◷ SCHEDULED' }}</span>
-                    <button type="button" class="manage-link" (click)="viewBookings.emit()">Manage booking</button>
+                    <span class="booking-state">{{ booking.status === 'CONFIRMED' ? i18n.t('booked') : booking.status === 'SCHEDULED' ? i18n.t('scheduled') : i18n.t('bookingFailed') }}</span>
+                    <button type="button" class="manage-link" (click)="viewBookings.emit()">{{ i18n.t('manageBooking') }}</button>
                   } @else if (cls.free_slots === 0) {
-                    <span class="unavailable-state">FULL</span>
+                    <span class="unavailable-state">{{ i18n.t('full') }}</span>
                   } @else if (isWithinWindow(cls.start_time)) {
-                    <button type="button" class="primary-action" (click)="bookClass(cls.id)">BOOK NOW <span aria-hidden="true">↗</span></button>
+                    <button type="button" class="primary-action" (click)="bookClass(cls.id)">{{ i18n.t('bookNow') }} <span aria-hidden="true">↗</span></button>
                   } @else {
-                    <button type="button" class="primary-action" (click)="scheduleClass(cls)">SCHEDULE <span aria-hidden="true">↗</span></button>
+                    <button type="button" class="primary-action" (click)="scheduleClass(cls)">{{ i18n.t('schedule') }} <span aria-hidden="true">↗</span></button>
                   }
                 </div>
               </article>

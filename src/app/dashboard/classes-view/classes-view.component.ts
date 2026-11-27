@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, computed, inject, output, signal} from '@angular/core';
 import {format, isAfter, isBefore, subMinutes} from 'date-fns';
 import {Booking, ClassService, GymClass} from '../../services/class.service';
+import {LanguageService} from '../../services/language.service';
 
 @Component({
   selector: 'app-classes-view',
@@ -10,28 +11,31 @@ import {Booking, ClassService, GymClass} from '../../services/class.service';
 })
 export class ClassesViewComponent {
   readonly classService = inject(ClassService);
+  readonly i18n = inject(LanguageService);
   readonly viewBookings = output<void>();
   readonly activeDay = signal<string | null>(null);
 
   readonly groupedClasses = computed(() => {
     const classes = this.classService.classes().filter(cls => !this.isPast(cls.start_time));
     const grouped = new Map<string, GymClass[]>();
+    const language = this.i18n.language();
+    const locale = this.i18n.dateLocale();
 
     for (const cls of classes) {
-      const dateStr = format(new Date(cls.start_time), 'EEEE, MMM do');
-      if (!grouped.has(dateStr)) {
-        grouped.set(dateStr, []);
+      const dayKey = format(new Date(cls.start_time), 'yyyy-MM-dd');
+      if (!grouped.has(dayKey)) {
+        grouped.set(dayKey, []);
       }
-      grouped.get(dateStr)!.push(cls);
+      grouped.get(dayKey)!.push(cls);
     }
 
-    return Array.from(grouped.entries()).map(([date, items]) => {
+    return Array.from(grouped.entries()).map(([id, items]) => {
       const parsedDate = new Date(items[0].start_time);
       return {
-        date,
-        weekday: format(parsedDate, 'EEE').toUpperCase(),
+        date: format(parsedDate, language === 'es' ? "EEEE, d 'de' MMMM" : 'EEEE, MMM do', {locale}),
+        weekday: format(parsedDate, 'EEE', {locale}).toUpperCase(),
         dayNumber: format(parsedDate, 'd'),
-        id: date.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        id: `day-${id}`,
         classes: items,
       };
     });

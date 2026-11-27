@@ -5,6 +5,7 @@ import {isBefore} from 'date-fns';
 import {ClassesViewComponent} from './classes-view/classes-view.component';
 import {BookingsViewComponent} from './bookings-view/bookings-view.component';
 import {DashboardTab, HeaderComponent} from './header/header.component';
+import {LanguageService} from '../services/language.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,6 +16,7 @@ import {DashboardTab, HeaderComponent} from './header/header.component';
 })
 export class DashboardComponent implements OnInit {
   readonly classService = inject(ClassService);
+  readonly i18n = inject(LanguageService);
   readonly activeTab = signal<DashboardTab>('schedule');
   readonly showScrollToTop = signal(false);
   readonly bookingCount = computed(() => {

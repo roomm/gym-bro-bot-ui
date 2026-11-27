@@ -1,15 +1,19 @@
 <header class="site-header">
   <div class="site-header__inner">
     <div class="site-brand" aria-label="Gym Bro"><span class="site-brand__mark">G</span><span>GYM BRO</span></div>
-    <nav class="site-nav" aria-label="Main navigation">
-      <button type="button" [class.is-active]="activeTab() === 'schedule'" [attr.aria-current]="activeTab() === 'schedule' ? 'page' : null" (click)="tabChange.emit('schedule')">Class schedule</button>
+    <nav class="site-nav" [attr.aria-label]="i18n.t('mainNavigation')">
+      <button type="button" [class.is-active]="activeTab() === 'schedule'" [attr.aria-current]="activeTab() === 'schedule' ? 'page' : null" (click)="tabChange.emit('schedule')">{{ i18n.t('scheduleTab') }}</button>
       <button type="button" [class.is-active]="activeTab() === 'bookings'" [attr.aria-current]="activeTab() === 'bookings' ? 'page' : null" (click)="tabChange.emit('bookings')">
-        My bookings @if (bookingCount() > 0) {<span class="nav-count">{{ bookingCount() }}</span>}
+        {{ i18n.t('bookingsTab') }} @if (bookingCount() > 0) {<span class="nav-count">{{ bookingCount() }}</span>}
       </button>
     </nav>
     <div class="site-account">
+      <div class="language-switch" role="group" [attr.aria-label]="i18n.t('language')">
+        <button type="button" lang="es" [attr.aria-pressed]="i18n.language() === 'es'" (click)="i18n.setLanguage('es')">ES</button>
+        <button type="button" lang="en" [attr.aria-pressed]="i18n.language() === 'en'" (click)="i18n.setLanguage('en')">EN</button>
+      </div>
       <span class="site-account__email">{{ auth.currentUser()?.email }}</span>
-      <button type="button" (click)="auth.logout()">Sign out <span aria-hidden="true">↗</span></button>
+      <button type="button" class="sign-out" (click)="auth.logout()">{{ i18n.t('signOut') }} <span aria-hidden="true">↗</span></button>
     </div>
   </div>
 </header>

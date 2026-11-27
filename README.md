@@ -22,6 +22,10 @@ pnpm start
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 The development configuration sends API requests to `http://localhost:55555/api`.
 
+## Languages
+
+The sign-in screen and dashboard offer an **ES / EN** switcher. The app initially uses the browser language (Spanish for `es` locales, English otherwise), remembers your selection in local storage, and updates dates and page language immediately. UI text lives in `src/app/services/language.service.ts`. Class names, instructor names, room names, and unrecognized messages returned by the API are displayed as supplied by the server.
+
 ## Code scaffolding
 
 Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
